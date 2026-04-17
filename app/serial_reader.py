@@ -7,5 +7,6 @@ def read_serial(port="/dev/ttyUSB0", baudrate=9600) :
         # Read the oldest line in the USB driver buffer
         line = ser.readline().decode(errors="ignore").strip()
 
+        # Create a file generator
         if line :
             yield line
