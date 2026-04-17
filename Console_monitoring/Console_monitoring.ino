@@ -1,39 +1,36 @@
-int pin1, pin2, pin3;
+const int pin12v, pin5v, pinTX = 10, 11, 12;
+int state12v, state5v, stateTX,
+
 
 void setup() {
   // Input setup
-  pinMode(11, INPUT_PULLUP);  // Red wire -- +12V power on
-  pinMode(12, INPUT_PULLUP);  // Green wire -- +5V power on
-  pinMode(13, INPUT_PULLUP);  // Orange wire -- RF TX power on
+  pinMode(pin12v, INPUT_PULLUP);  // Red wire -- +12V power on
+  pinMode(pin5v, INPUT_PULLUP);  // Green wire -- +5V power on
+  pinMode(pinTX, INPUT_PULLUP);  // Orange wire -- RF TX power on
 
   // Output setup
   Serial.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT);
 
   // Pin state setup
-  pin1 = digitalRead(11);
-  pin2 = digitalRead(12);
-  pin3 = digitalRead(13);
+  state12v = digitalRead(pin12v);
+  state5v = digitalRead(pin5v);
+  stateTX = digitalRead(pinTX);
 
-  Serial.print("The pin number 1 was initially ");
-  if (pin1 == 0) { Serial.println("off");}
-  else { Serial.println("on");}
-  Serial.print("The pin number 2 was initially ");
-  if (pin2 == 0) { Serial.println("off");}
-  else { Serial.println("on");}
-  Serial.print("The pin number 3 was initially ");
-  if (pin3 == 0) { Serial.println("off");}
-  else { Serial.println("on");}
+  print_pin_state(pin12V)
+  print_pin_state(pin5V)
+  print_pin_state(pinTX)
 }
 
 void loop() {
 
-  pin1 = check_pin_state_change(pin1, 11);
-  pin2 = check_pin_state_change(pin2, 12);
-  pin3 = check_pin_state_change(pin3, 13);
+  state12v = check_pin_state_change(state12v, pin12v);
+  state5v = check_pin_state_change(state5v, pin5v);
+  stateTX = check_pin_state_change(stateTX, pinTX);
 
   delay(500);
 }
+
 
 int check_pin_state_change(int old_state, int pin_number) {
   /* 
@@ -44,13 +41,31 @@ int check_pin_state_change(int old_state, int pin_number) {
 
   int new_state = digitalRead(pin_number);
 
-  if (old_state > new_state) {
-    Serial.println("The pin number " + String(pin_number) + " has turned off");
-  }
-
-  if (old_state < new_state) {
-    Serial.println("The pin number " + String(pin_number) + " has turned on");
+  if (old_state != new_state) {
+    print_pin_state(pin_number)
   }
 
   return new_state;
+}
+
+void print_pin_state(pin_number) {
+
+  // Print pin reference
+  if (pin_number == pin12v) {
+    Serial.print("12V: ")
+  } 
+  else if (pin_number == pin5v) {
+    Serial.print("5V: ")
+  } 
+  else if (pin_number == pinTX) {
+    Serial.print("TX: ")
+  } 
+
+  // Print pin state
+  if (digitalRead(pin_number) == 1) {
+    Serial.print("OFF")
+  }
+  else {
+    Serial.print("ON")
+  }
 }
