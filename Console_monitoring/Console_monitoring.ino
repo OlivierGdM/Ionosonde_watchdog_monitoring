@@ -1,5 +1,7 @@
-const int pin12v, pin5v, pinTX = 10, 11, 12;
-int state12v, state5v, stateTX,
+const int pin12v = 10;
+const int pin5v = 11;
+const int pinTX = 12; 
+int state12v, state5v, stateTX;
 
 
 void setup() {
@@ -17,9 +19,9 @@ void setup() {
   state5v = digitalRead(pin5v);
   stateTX = digitalRead(pinTX);
 
-  print_pin_state(pin12V)
-  print_pin_state(pin5V)
-  print_pin_state(pinTX)
+  print_pin_state(pin12v);
+  print_pin_state(pin5v);
+  print_pin_state(pinTX);
 }
 
 void loop() {
@@ -42,30 +44,30 @@ int check_pin_state_change(int old_state, int pin_number) {
   int new_state = digitalRead(pin_number);
 
   if (old_state != new_state) {
-    print_pin_state(pin_number)
+    print_pin_state(pin_number);
   }
 
   return new_state;
 }
 
-void print_pin_state(pin_number) {
+void print_pin_state(int pin_number) {
 
   // Print pin reference
   if (pin_number == pin12v) {
-    Serial.print("12V: ")
+    Serial.print("12V: ");
   } 
   else if (pin_number == pin5v) {
-    Serial.print("5V: ")
+    Serial.print("5V: ");
   } 
   else if (pin_number == pinTX) {
-    Serial.print("TX: ")
+    Serial.print("TX: ");
   } 
 
   // Print pin state
   if (digitalRead(pin_number) == 1) {
-    Serial.print("OFF")
+    Serial.println("OFF");
   }
   else {
-    Serial.print("ON")
+    Serial.println("ON");
   }
 }
