@@ -7,9 +7,9 @@ def main() :
     config = configparser.ConfigParser()
     config.read("config.ini")
     
-    usb_port = config['Settings']['usb_port']
-    baudrate = config['Settings']['baudrate']
-    log_path = config['Settings']['log_path']
+    usb_port = config.get('Settings', 'usb_port')
+    baudrate = config.getint('Settings', 'baudrate')
+    log_path = config.get('Settings', 'log_path')
 
     for line in read_serial(port=usb_port, baudrate=baudrate) : 
         write_log(msg=line, file_path=log_path)
