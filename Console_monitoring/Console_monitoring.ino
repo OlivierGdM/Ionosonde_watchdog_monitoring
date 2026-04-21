@@ -1,14 +1,14 @@
-const int pin12v = 10;
-const int pin5v = 11;
-const int pinTX = 12; 
+const int pin12v = 10;  // Red wire -- +12V power on
+const int pin5v = 11;   // Green wire -- +5V power on
+const int pinTX = 12;   // Orange wire -- RF TX power on
 int state12v, state5v, stateTX;
 
 
 void setup() {
   // Input setup
-  pinMode(pin12v, INPUT_PULLUP);  // Red wire -- +12V power on
-  pinMode(pin5v, INPUT_PULLUP);  // Green wire -- +5V power on
-  pinMode(pinTX, INPUT_PULLUP);  // Orange wire -- RF TX power on
+  pinMode(pin12v, INPUT_PULLUP);
+  pinMode(pin5v, INPUT_PULLUP);
+  pinMode(pinTX, INPUT_PULLUP);
 
   // Output setup
   Serial.begin(9600);
