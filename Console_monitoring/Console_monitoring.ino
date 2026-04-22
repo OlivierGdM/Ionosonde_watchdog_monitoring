@@ -4,6 +4,45 @@ const int pinTX = 12;   // Orange wire -- RF TX power on
 int state12v, state5v, stateTX;
 
 
+void print_pin_state(int pin_number) {
+
+  // Print pin reference
+  if (pin_number == pin12v) {
+    Serial.print("12V: ");
+  } 
+  else if (pin_number == pin5v) {
+    Serial.print("5V: ");
+  } 
+  else if (pin_number == pinTX) {
+    Serial.print("TX: ");
+  } 
+
+  // Print pin state
+  if (digitalRead(pin_number) == 1) {
+    Serial.println("OFF");
+  }
+  else {
+    Serial.println("ON");
+  }
+}
+
+int check_pin_state_change(int old_state, int pin_number) {
+  /* 
+  Checks for a difference between a pin's old state and new state
+  If there is a difference between the two, send a message to the console
+  In any case, returns new_state 
+  */
+
+  int new_state = digitalRead(pin_number);
+
+  if (old_state != new_state) {
+    print_pin_state(pin_number);
+  }
+
+  return new_state;
+}
+
+
 void setup() {
   // Input setup
   pinMode(pin12v, INPUT_PULLUP);
@@ -31,43 +70,4 @@ void loop() {
   stateTX = check_pin_state_change(stateTX, pinTX);
 
   delay(500);
-}
-
-
-int check_pin_state_change(int old_state, int pin_number) {
-  /* 
-  Checks for a difference between a pin's old state and new state
-  If there is a difference between the two, send a message to the console
-  In any case, returns new_state 
-  */
-
-  int new_state = digitalRead(pin_number);
-
-  if (old_state != new_state) {
-    print_pin_state(pin_number);
-  }
-
-  return new_state;
-}
-
-void print_pin_state(int pin_number) {
-
-  // Print pin reference
-  if (pin_number == pin12v) {
-    Serial.print("12V: ");
-  } 
-  else if (pin_number == pin5v) {
-    Serial.print("5V: ");
-  } 
-  else if (pin_number == pinTX) {
-    Serial.print("TX: ");
-  } 
-
-  // Print pin state
-  if (digitalRead(pin_number) == 1) {
-    Serial.println("OFF");
-  }
-  else {
-    Serial.println("ON");
-  }
 }
