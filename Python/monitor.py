@@ -1,6 +1,16 @@
 import serial
 import time
+import configparser
+from datetime import datetime, timezone
 
+
+
+# This function is the main loop of the programme.
+# The idea is to generate a queue of mesages from which we pull the oldest, timestamp it and then print it.
+#
+# It first repeatedly tries to establish the serial connection with the arduino.
+# Once the connection is established, it pulls the information from the USB buffer and adds it to the queue.
+# If the serial connection is cut, we break the reading loop and go back to the connection loop
 def read_serial(port="/dev/ttyACM0", baudrate=9600) :
     """Arduino output logs queue generator"""
     flag = True
@@ -13,7 +23,7 @@ def read_serial(port="/dev/ttyACM0", baudrate=9600) :
         
         # Catches an error when the serial connection attemp fails
         except serial.SerialException as err :
-            # Yield error message once to avoid flooding
+            # Yield error message once only to avoid flooding
             if flag :
                 flag = False
                 yield f"Serial connection failed with port {port} and baudrate {baudrate}. Trying again..."
@@ -40,4 +50,25 @@ def read_serial(port="/dev/ttyACM0", baudrate=9600) :
 
                 # Break reading loop. Initiate reconnection
                 flag = True
-                break 
+                break
+
+
+# A simple function to timestamp and write a line in the log file
+def write_log(msg:str, file_path="logs/arduino.log") :
+    timestamp = datetime.now().astimezone(timezone.utc)
+    with open(file_path, 'a') as f :
+        f.write(f"{timestamp.isoformat()} - {msg}\n") 
+
+
+
+if __name__ == "__main__" :
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    
+    usb_port = config.get('Settings', 'usb_port')
+    baudrate = config.getint('Settings', 'baudrate')
+    log_path = config.get('Settings', 'log_path')
+
+    for line in read_serial(port=usb_port, baudrate=baudrate) : 
+        write_log(msg=line, file_path=log_path)
+        print(line)
