@@ -1,6 +1,7 @@
 import serial
 import time
 import configparser
+from pathlib import Path
 from datetime import datetime, timezone
 
 
@@ -63,12 +64,29 @@ def write_log(msg:str, file_path="logs/arduino.log") :
 
 if __name__ == "__main__" :
     config = configparser.ConfigParser()
-    config.read("config.ini")
-    
-    usb_port = config.get('Settings', 'usb_port')
-    baudrate = config.getint('Settings', 'baudrate')
-    log_path = config.get('Settings', 'log_path')
+    # Check if config.ini exists
+    if not config.read("config.ini") : 
+        raise FileNotFoundError(f"Could not find config.ini in {Path.cwd()} directory, with monitor.py.")
 
-    for line in read_serial(port=usb_port, baudrate=baudrate) : 
+    # Check for formatting errors
+    else :
+        baudrate = config.get('Settings', 'baudrate')
+        usb_port = config.get('Settings', 'usb_port')
+        log_path = config.get('Settings', 'log_path')
+
+        if not Path(usb_port).is_absolute() :
+            raise ValueError("usb_port was not defined as an absolute path in config.ini")
+        if not Path(usb_port).is_symlink() :
+            raise ValueError("usb_port path was not defined as a symlink path in config.ini")
+        
+        if not Path(log_path).is_absolute() :
+            raise ValueError("log_path was not defined as an absolute path in config.ini")
+        if not Path(log_path).is_file() :
+            raise ValueError("log_path was not defined as a file path in config.ini")
+        
+        if not baudrate.isdigit() :
+            raise ValueError("baudrate was not defined as an integer in config.ini")
+    
+    for line in read_serial(port=usb_port, baudrate=int(baudrate)) : 
         write_log(msg=line, file_path=log_path)
         print(line)
