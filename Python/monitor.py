@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 # It first repeatedly tries to establish the serial connection with the arduino.
 # Once the connection is established, it pulls the information from the USB buffer and adds it to the queue.
 # If the serial connection is cut, we break the reading loop and go back to the connection loop
-def read_serial(port="/dev/ttyACM0", baudrate=9600) :
+def read_serial(port:str, baudrate:int) :
     """Arduino output logs queue generator"""
     flag = True
 
@@ -55,7 +55,7 @@ def read_serial(port="/dev/ttyACM0", baudrate=9600) :
 
 
 # A simple function to timestamp and write a line in the log file
-def write_log(msg:str, file_path="logs/arduino.log") :
+def write_log(msg:str, file_path:str) :
     timestamp = datetime.now().astimezone(timezone.utc)
     with open(file_path, 'a') as f :
         f.write(f"{timestamp.isoformat()} - {msg}\n") 
