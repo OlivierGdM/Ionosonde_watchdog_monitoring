@@ -5,10 +5,10 @@ const int pinTX = 12;   // Orange wire -- RF TX power on
 int state12v, state5v, stateTX;
 
 // Basic parameters for the Vishay thermistor
-const float BETA 3977.0
-const float R25 10000.0
-const float T25 298.15
-const float REXT 10000.0   // The upper arm of the voltage divider has a 10k resistor
+const float BETA = 3977.0;
+const float R25 = 10000.0;
+const float T25 = 298.15;
+const float REXT = 10000.0; // The upper arm of the voltage divider has a 10k resistor
 
 // Variables for calculating average temperature as cumulT/count
 // Where 'cumulT' is the cumulative sum of instant temperatures and 'count' the number of summed temperatures 
@@ -70,12 +70,12 @@ bool print_temperature(float cumulT, int count) {
   // Prints the average temperature calculated over the course of 600 measures (~5 minutes)
   // Only print if a sufficient amount of measures have been taken
   if count >= 600 {
-    Serial.print("T: ")
-    Serial.println(cumulT/count)
-    return True
+    Serial.print("T: ");
+    Serial.println(cumulT/count);
+    return True;
   }
   else {
-    return False
+    return False;
   }
 }
 
@@ -112,7 +112,7 @@ void loop() {
 
   // Temperature monitoring
   cumulT = cumulT + temperatureNTC(analogRead(A0), REXT);
-  count++
+  count++;
   if print_temperature(cumulT, count) {
     // Start a new average
     cumulT = 0;
