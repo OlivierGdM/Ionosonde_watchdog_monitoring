@@ -1,9 +1,23 @@
+// Digital pin parameters
 const int pin12v = 10;  // Red wire -- +12V power on
 const int pin5v = 11;   // Green wire -- +5V power on
 const int pinTX = 12;   // Orange wire -- RF TX power on
 int state12v, state5v, stateTX;
 
+// Basic parameters for the Vishay thermistor
+const float BETA 3977.0
+const float R25 10000.0
+const float T25 298.15
+const float REXT 10000.0   // The upper arm of the voltage divider has a 10k resistor
 
+// Variables for calculating average temperature as cumulT/count
+// Where 'cumulT' is the cumulative sum of instant temperatures and 'count' the number of summed temperatures 
+int count;
+float cumulT;
+
+
+
+// Functions for digital values management
 void print_pin_state(int pin_number) {
 
   // Print pin reference
@@ -43,11 +57,36 @@ int check_pin_state_change(int old_state, int pin_number) {
 }
 
 
+// Functions for temperature management
+float temperatureNTC(uint16_t adc, float rfixed) {
+  // Formula for converting the adc-value into degrees Celsius
+  float a = adc / 1023.0;
+  float r = a / (1.0 - a) * rfixed;
+  float T = BETA / (logf(r / R25) + BETA / T25);
+  return T - 273.15;
+}
+
+bool print_temperature(float cumulT, int count) {
+  // Prints the average temperature calculated over the course of 600 measures (~5 minutes)
+  // Only print if a sufficient amount of measures have been taken
+  if count >= 600 {
+    Serial.print("T: ")
+    Serial.println(cumulT/count)
+    return True
+  }
+  else {
+    return False
+  }
+}
+
+
+
 void setup() {
   // Input setup
   pinMode(pin12v, INPUT_PULLUP);
   pinMode(pin5v, INPUT_PULLUP);
   pinMode(pinTX, INPUT_PULLUP);
+  pinMode(A0, INPUT);
 
   // Output setup
   Serial.begin(9600);
@@ -57,6 +96,8 @@ void setup() {
   state12v = digitalRead(pin12v);
   state5v = digitalRead(pin5v);
   stateTX = digitalRead(pinTX);
+  cumulT = 0.0;
+  count = 0;
 
   print_pin_state(pin12v);
   print_pin_state(pin5v);
@@ -64,10 +105,19 @@ void setup() {
 }
 
 void loop() {
-
+  // Watchdog tensions monitoring
   state12v = check_pin_state_change(state12v, pin12v);
   state5v = check_pin_state_change(state5v, pin5v);
   stateTX = check_pin_state_change(stateTX, pinTX);
+
+  // Temperature monitoring
+  cumulT = cumulT + temperatureNTC(analogRead(A0), REXT);
+  count++
+  if print_temperature(cumulT, count) {
+    // Start a new average
+    cumulT = 0;
+    count = 0;
+  }
 
   delay(500);
 }
