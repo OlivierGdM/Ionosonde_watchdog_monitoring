@@ -9,7 +9,6 @@ const float BETA = 3977.0;
 const float R25 = 10000.0;
 const float T25 = 298.15;
 const float REXT = 10000.0; // The upper arm of the voltage divider has a 10k resistor
-const int ResolutionT = 5; // Number of minutes between two temperature outputs
 
 // Variables for calculating average temperature as cumulT/count
 // Where 'cumulT' is the cumulative sum of instant temperatures and 'count' the number of summed temperatures 
@@ -67,17 +66,10 @@ float temperatureNTC(uint16_t adc, float rfixed) {
   return T - 273.15;
 }
 
-bool print_temperature(float cumulT, int count) {
-  // Prints the average temperature calculated over the course of ResolutionT minutes
-  // Only print if a sufficient amount of measures have been taken
-  if (count >= 60 * 2 * ResolutionT) {
-    Serial.print("T: ");
-    Serial.println(cumulT/count);
-    return true;
-  }
-  else {
-    return false;
-  }
+void print_temperature(float cumulT, int count) {
+  // Prints the average temperature calculated over count measures
+  Serial.print("T: ");
+  Serial.println(cumulT/count);
 }
 
 
@@ -114,10 +106,18 @@ void loop() {
   // Temperature monitoring
   cumulT = cumulT + temperatureNTC(analogRead(A0), REXT);
   count++;
-  if (print_temperature(cumulT, count)) {
-    // Start a new average
-    cumulT = 0;
-    count = 0;
+
+  // Ping receiver
+  if (Serial.available() > 0) {
+    String request = Serial.readString();
+    request.trim();
+    
+    if (request == "SendT") {
+      print_temperature(cumulT, count);
+      // Start a new average
+      cumulT = 0;
+      count = 0;
+    }
   }
 
   delay(500);
