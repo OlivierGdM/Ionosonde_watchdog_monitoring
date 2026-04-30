@@ -9,7 +9,7 @@ const float BETA = 3977.0;
 const float R25 = 10000.0;
 const float T25 = 298.15;
 const float REXT = 10000.0; // The upper arm of the voltage divider has a 10k resistor
-const int ResolutionT = 1; // Number of minutes between two values of the temperature
+const int ResolutionT = 5; // Number of minutes between two temperature outputs
 
 // Variables for calculating average temperature as cumulT/count
 // Where 'cumulT' is the cumulative sum of instant temperatures and 'count' the number of summed temperatures 
