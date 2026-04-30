@@ -104,10 +104,12 @@ if __name__ == "__main__" :
             raise ValueError("log_path was not defined as a file path in config.ini")
         
         if not baudrate.isdigit() :
-            raise ValueError("baudrate was not defined as an integer in config.ini")
+            raise ValueError("baudrate was not defined as a positive integer in config.ini")
         
-        if not temperature_interval.isdigit() :
-            raise ValueError("temperature_interval was not defined as an integer in config.ini")
+        try :
+            temperature_interval = float(temperature_interval)
+        except :
+            raise ValueError("temperature_interval was not defined as an integer or float in config.ini")
     
     for line in read_serial(port=usb_port, baudrate=int(baudrate), temperature_interval=temperature_interval) : 
         write_log(msg=line, file_path=log_path)
