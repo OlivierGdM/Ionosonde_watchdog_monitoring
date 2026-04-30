@@ -3,4 +3,5 @@ channels:
   - defaults
 dependencies:
   - pip
+  - pyserial
 prefix: /home/olivier/miniconda3/envs/VenvWatchdog
